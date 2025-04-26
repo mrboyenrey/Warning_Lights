@@ -43,5 +43,5 @@ server.listen(PORT, async () => {
 
   // Use dynamic import for the `open` package
   const { default: open } = await import('open');
-  await open(`http://localhost:${PORT}`); // Open the dashboard in the default browser
+  await open(`http://${server.address().address || 'localhost'}:${PORT}`); // Open the dashboard in the default browser
 });

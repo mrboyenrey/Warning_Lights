@@ -35,10 +35,11 @@ This project is a WebSocket-based warning lights system that includes a dashboar
    ```bash
    npm start
    ```
-2. The dashboard will automatically open in your default browser. If it doesn't, navigate to:
+2. Open the dashboard in your browser:
    ```
-   http://localhost:8080
+   http://<server-ip>:8080
    ```
+   Replace `<server-ip>` with the actual IP address or hostname of the server. If running locally, use `http://localhost:8080`.
 
 ## Components
 
