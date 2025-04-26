@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard</title>
+  <style>
+    body {
+      background-color: #111;
+      color: white;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .status {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    .light-indicator {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background-color: #222;
+      box-shadow: 0 0 25px #000;
+      transition: background-color 0.5s ease, box-shadow 0.5s ease;
+    }
+
+    .light-indicator.red {
+      background-color: red;
+      box-shadow: 0 0 50px 20px rgba(255, 0, 0, 0.7);
+    }
+
+    .light-indicator.yellow {
+      background-color: yellow;
+      box-shadow: 0 0 50px 20px rgba(255, 255, 0, 0.7);
+    }
+
+    .light-indicator.green {
+      background-color: limegreen;
+      box-shadow: 0 0 50px 20px rgba(50, 255, 50, 0.7);
+    }
+
+    button {
+      padding: 12px 24px;
+      font-size: 18px;
+      background-color: #444;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin: 10px;
+    }
+
+    button:hover {
+      background-color: #666;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="status">Current Light Status: <span id="lightStatus">None</span></div>
+  <div id="lightIndicator" class="light-indicator"></div>
+
+  <div class="controls">
+    <button onclick="sendCommand('red')">Red</button>
+    <button onclick="sendCommand('yellow')">Yellow</button>
+    <button onclick="sendCommand('green')">Green</button>
+    <button onclick="sendCommand('off')">Turn Off</button>
+  </div>
+
+  <script>
+    const socket = new WebSocket('ws://localhost:8080'); // Connect to the WebSocket server
+
+    socket.addEventListener('open', () => {
+      console.log('WebSocket connection established.');
+    });
+
+    socket.addEventListener('error', (error) => {
+      console.error('WebSocket error:', error);
+    });
+
+    socket.addEventListener('message', (event) => {
+      const command = event.data;
+      console.log(`Command received: ${command}`); // Log received commands
+
+      const lightStatus = document.getElementById('lightStatus');
+      const lightIndicator = document.getElementById('lightIndicator');
+
+      // Update the dashboard based on the command
+      if (command === 'red') {
+        lightStatus.textContent = 'Red';
+        lightIndicator.className = 'light-indicator red';
+      } else if (command === 'yellow') {
+        lightStatus.textContent = 'Yellow';
+        lightIndicator.className = 'light-indicator yellow';
+      } else if (command === 'green') {
+        lightStatus.textContent = 'Green';
+        lightIndicator.className = 'light-indicator green';
+      } else if (command === 'off') {
+        lightStatus.textContent = 'None';
+        lightIndicator.className = 'light-indicator';
+      }
+    });
+
+    function sendCommand(cmd) {
+      if (socket.readyState === WebSocket.OPEN) {
+        socket.send(cmd);
+        console.log(`Command sent: ${cmd}`); // Log the sent command
+      } else {
+        console.error('WebSocket is not open. Command not sent:', cmd);
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Warning Light Display</title>
+  <style>
+       body {
+      background-color: #111;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    .light-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 30px;
+    }
+
+    .light {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background-color: #222;
+      box-shadow: 0 0 25px #000;
+      transition: background-color 0.5s ease, box-shadow 0.5s ease;
+    }
+
+    .light.red.on {
+      background-color: red;
+      box-shadow: 0 0 50px 20px rgba(255, 0, 0, 0.7);
+      animation: pulseRed 1s infinite;
+    }
+
+    .light.yellow.on {
+      background-color: yellow;
+      box-shadow: 0 0 50px 20px rgba(255, 255, 0, 0.7);
+      animation: pulseYellow 1s infinite;
+    }
+
+    .light.green.on {
+      background-color: limegreen;
+      box-shadow: 0 0 50px 20px rgba(50, 255, 50, 0.7);
+      animation: pulseGreen 1s infinite;
+    }
+
+    @keyframes pulseRed {
+      0%, 100% { box-shadow: 0 0 50px 20px rgba(255, 0, 0, 0.7); }
+      50% { box-shadow: 0 0 70px 30px rgba(255, 0, 0, 1); }
+    }
+
+    @keyframes pulseYellow {
+      0%, 100% { box-shadow: 0 0 50px 20px rgba(255, 255, 0, 0.7); }
+      50% { box-shadow: 0 0 70px 30px rgba(255, 255, 0, 1); }
+    }
+
+    @keyframes pulseGreen {
+      0%, 100% { box-shadow: 0 0 50px 20px rgba(50, 255, 50, 0.7); }
+      50% { box-shadow: 0 0 70px 30px rgba(50, 255, 50, 1); }
+    }
+
+    button {
+      padding: 12px 24px;
+      font-size: 18px;
+      background-color: #444;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="light-box">
+    <div id="redLight" class="light red"></div>
+    <div id="yellowLight" class="light yellow"></div>
+    <div id="greenLight" class="light green"></div>
+  </div>
+
+  <script>
+    const socket = new WebSocket('ws://localhost:8080'); // Ensure the WebSocket URL matches the server
+
+    socket.addEventListener('open', () => {
+      console.log('WebSocket connection established.');
+    });
+
+    socket.addEventListener('error', (error) => {
+      console.error('WebSocket error:', error);
+    });
+
+    socket.addEventListener('close', () => {
+      console.warn('WebSocket connection closed.');
+    });
+
+    socket.addEventListener('message', (event) => {
+      const command = event.data;
+      console.log(`Command received: ${command}`); // Log received commands
+      if (command === 'red') setLight('red');
+      else if (command === 'yellow') setLight('yellow');
+      else if (command === 'green') setLight('green');
+      else if (command === 'off') turnOffLights();
+    });
+
+    function setLight(color) {
+      ['red', 'yellow', 'green'].forEach(c => {
+        document.getElementById(c + 'Light').classList.remove('on');
+      });
+      if (color) {
+        document.getElementById(color + 'Light').classList.add('on');
+      }
+    }
+
+    function turnOffLights() {
+      setLight(null);
+    }
+
+    window.onload = () => {
+      setLight('red');
+    };
+  </script>
+</body>
+</html>
